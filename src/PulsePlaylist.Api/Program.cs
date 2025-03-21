@@ -27,6 +27,16 @@ builder.Services.Configure<WebpushrOptions>(builder.Configuration.GetSection(Web
 
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);
+// Add session support for OAuth state parameter
+builder.Services.AddDistributedMemoryCache();
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(30);
+    options.Cookie.HttpOnly = true;
+    options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+    options.Cookie.SameSite = SameSiteMode.Lax;
+});
+
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultScheme = IdentityConstants.ApplicationScheme;
@@ -109,6 +119,8 @@ app.UseExceptionHandler();
 app.MapEndpointDefinitions();
 app.UseCors("wasm");
 app.UseAntiforgery();
+// Add session middleware
+app.UseSession();
 app.Use(async (context, next) =>
 {
     var currentUserContextSetter = context.RequestServices.GetRequiredService<ICurrentUserContextSetter>();
@@ -139,7 +151,3 @@ app.UseStaticFiles(new StaticFileOptions
     RequestPath = new PathString("/files")
 });
 await app.RunAsync();
-
-
-
-

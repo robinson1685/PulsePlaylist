@@ -1,4 +1,4 @@
-// Licensed to the .NET Foundation under one or more agreements.
+﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
@@ -128,6 +128,7 @@ public class StockEndpointTests
         // Dispose of the HttpClient and Handler
         _httpClient?.Dispose();
         _httpClientHandler?.Dispose();
+        _resourceNotificationService?.Dispose();
 
         // Dispose of the _app if it's not null
         if (_app is not null)

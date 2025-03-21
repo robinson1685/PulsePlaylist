@@ -108,7 +108,7 @@
     {
         try
         {
-            var result = await ApiClient.Account.Google.LoginUrl.GetAsync(x=>x.QueryParameters.State = Navigation.BaseUri);
+            var result = await ApiClient.Account.Google.LoginUrl.GetAsync();
             if(!string.IsNullOrEmpty(result))
             {
                 Navigation.NavigateTo(result);

@@ -241,16 +241,8 @@ public static class IdentityApiAdditionalEndpointsExtensions
 
 
 
-        routeGroup.MapGet("/google/loginUrl", ([FromQuery] string state, HttpContext context) =>
+        routeGroup.MapGet("/google/loginUrl", (HttpContext context) =>
         {
-            if (string.IsNullOrEmpty(state))
-            {
-                return Results.ValidationProblem(new Dictionary<string, string[]>
-                {
-                    { "state", new[] { "The state parameter is required." } }
-                });
-            }
-
             var configuration = context.RequestServices.GetRequiredService<IConfiguration>();
             var clientId = configuration["Authentication:Google:ClientId"];
             if (string.IsNullOrEmpty(clientId))
@@ -266,13 +258,11 @@ public static class IdentityApiAdditionalEndpointsExtensions
                 ? $"{context.Request.Scheme}://{context.Request.Host}/external-login"
                 : $"{baseRedirectUri}/external-login";
 
-            if (!redirectUri.StartsWith(state))
-            {
-                return Results.ValidationProblem(new Dictionary<string, string[]>
-                {
-                    { "state", new[] { "The state parameter does not match the redirect URI." } }
-                });
-            }
+            // Generate a secure random state parameter
+            var state = Convert.ToBase64String(System.Security.Cryptography.RandomNumberGenerator.GetBytes(32));
+
+            // Store the state in session
+            context.Session.SetString("GoogleOAuthState", state);
 
             var googleAuthUrl =
                 $"https://accounts.google.com/o/oauth2/v2/auth?" +
@@ -322,13 +312,18 @@ public static class IdentityApiAdditionalEndpointsExtensions
             }
             var redirectUri = $"{baseRedirectUri}/external-login";
 
-            if (!redirectUri.StartsWith(state))
+            // Validate state parameter
+            var storedState = context.Session.GetString("GoogleOAuthState");
+            if (string.IsNullOrEmpty(storedState) || storedState != state)
             {
                 return Results.ValidationProblem(new Dictionary<string, string[]>
                 {
-                    { "state", new[] { "The state parameter does not match the redirect URI." } }
+                    { "state", new[] { "Invalid state parameter. Please try logging in again." } }
                 });
             }
+
+            // Clear the stored state after successful validation
+            context.Session.Remove("GoogleOAuthState");
 
             var idTokenRequestContent = new FormUrlEncodedContent
             ([
