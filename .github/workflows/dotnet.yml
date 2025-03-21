@@ -1,0 +1,34 @@
+name: .NET
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      # Install CA certificates to ensure SSL trust
+    - name: Install CA Certificates
+      run: sudo apt-get update && sudo apt-get install -y ca-certificates
+
+    - uses: actions/checkout@v4
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 9.0.x
+        
+      # Trust the ASP.NET Core development certificate
+    - name: Trust ASP.NET Core HTTPS Development Certificate
+      run: dotnet dev-certs https --trust
+
+    - name: Restore dependencies
+      run: dotnet restore PulsePlaylist.sln
+    - name: Build
+      run: dotnet build PulsePlaylist.sln --no-restore
+    - name: Run tests
+      run: dotnet test ./tests/PulsePlaylist.Tests/PulsePlaylist.Tests.csproj --no-build --verbosity normal

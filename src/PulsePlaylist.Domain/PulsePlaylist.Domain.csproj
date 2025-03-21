@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+	<RootNamespace>PulsePlaylist.Domain</RootNamespace>
+	<AssemblyName>PulsePlaylist.Domain</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+      <PackageReference Include="Mediator.Abstractions" Version="3.0.0-preview.27" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="9.0.2" />
+   
+  </ItemGroup>
+
+</Project>

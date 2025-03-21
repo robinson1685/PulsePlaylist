@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+	  <AssemblyName>PulsePlaylist.Migrators.SQLite</AssemblyName>
+	  <RootNamespace>PulsePlaylist.Migrators.SQLite</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\PulsePlaylist.Infrastructure\PulsePlaylist.Infrastructure.csproj" />
+  </ItemGroup>
+
+</Project>
