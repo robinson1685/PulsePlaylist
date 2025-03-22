@@ -368,3 +368,19 @@ src/PulsePlaylist.Api/appsettings.Development.json
 src/PulsePlaylist.Api/files/
 src/PulsePlaylist.Api/PulsePlaylist.Api.json
 src/PulsePlaylist.Api/pushsubscription.sqlitedb
+
+# Rider
+/.idea/
+# Default ignored files
+/shelf/
+/workspace.xml
+# Rider ignored files
+/projectSettingsUpdater.xml
+/contentModel.xml
+/modules.xml
+/.idea.PulsePlaylist.iml
+# Editor-based HTTP Client requests
+/httpRequests/
+# Datasource local storage ignored files
+/dataSources/
+/dataSources.local.xml

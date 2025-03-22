@@ -1,0 +1,100 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "2.0.0",
+    "configurations": [
+        {
+            "name": "Run AppHost (Aspire)",
+            "type": "stalker",
+            "request": "launch",
+            "vars": {
+                "projectName": "PulsePlaylist.AppHost",
+                "framework": "net9.0",
+                "projectDir": "${workspaceFolder}/src/${var:projectName}"
+            },
+            "project": "${var:projectDir}/${var:projectName}.csproj",
+            "process": "${var:projectDir}/bin/Debug/${var:framework}/${var:projectName}",
+            "cwd": "${var:projectDir}",
+            "env": {
+                "ASPNETCORE_ENVIRONMENT": "Development",
+                "NODE_ENV": "development",
+                "ASPNETCORE_URLS": "http://localhost:5000",
+                "DOTNET_DASHBOARD_OTLP_ENDPOINT_URL": "http://localhost:18889",
+                "DOTNET_DASHBOARD_OTLP_HTTP_ENDPOINT_URL": "http://localhost:18888",
+                "DOTNET_RESOURCE_SERVICE_ENDPOINT_URL": "http://localhost:17000",
+                "ASPIRE_ALLOW_UNSECURED_TRANSPORT": "true"
+            },
+            "buildOptions": {
+                "preBuildTasks": [
+                    {
+                        "name": "Clean",
+                        "commandLine": "dotnet clean ${workspaceFolder}/PulsePlaylist.sln",
+                        "isBackground": false
+                    }
+                ]
+            }
+        },
+        {
+            "name": "Debug WebApp",
+            "type": "stalker",
+            "request": "launch",
+            "vars": {
+                "projectName": "PulsePlaylist.WebApp",
+                "framework": "net9.0",
+                "projectDir": "${workspaceFolder}/src/${var:projectName}"
+            },
+            "project": "${var:projectDir}/${var:projectName}.csproj",
+            "process": "${var:projectDir}/bin/Debug/${var:framework}/${var:projectName}",
+            "cwd": "${var:projectDir}",
+            "env": {
+                "ASPNETCORE_ENVIRONMENT": "Development"
+            },
+            "webRoot": "${var:projectDir}/wwwroot",
+            "attachOptions": {
+                "action": "debugWithChrome"
+            }
+        },
+        {
+            "name": "Debug API",
+            "type": "stalker",
+            "request": "launch",
+            "vars": {
+                "projectName": "PulsePlaylist.Api",
+                "framework": "net9.0",
+                "projectDir": "${workspaceFolder}/src/${var:projectName}"
+            },
+            "project": "${var:projectDir}/${var:projectName}.csproj",
+            "process": "${var:projectDir}/bin/Debug/${var:framework}/${var:projectName}",
+            "cwd": "${var:projectDir}",
+            "env": {
+                "ASPNETCORE_ENVIRONMENT": "Development"
+            },
+            "attachOptions": {
+                "action": "openExternally"
+            }
+        },
+        {
+            "name": "Debug ClientApp",
+            "type": "stalker",
+            "request": "launch",
+            "vars": {
+                "projectName": "PulsePlaylist.ClientApp",
+                "framework": "net9.0",
+                "projectDir": "${workspaceFolder}/src/${var:projectName}"
+            },
+            "project": "${var:projectDir}/${var:projectName}.csproj",
+            "process": "${var:projectDir}/bin/Debug/${var:framework}/${var:projectName}",
+            "cwd": "${var:projectDir}",
+            "env": {
+                "ASPNETCORE_ENVIRONMENT": "Development",
+                "NODE_ENV": "development" 
+            },
+            "webRoot": "${var:projectDir}/wwwroot",
+            "attachOptions": {
+                "action": "debugWithChrome",
+                "urlPath": "/" 
+            }
+        }
+    ]
+}
