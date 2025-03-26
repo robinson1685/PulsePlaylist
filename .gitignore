@@ -384,3 +384,4 @@ src/PulsePlaylist.Api/pushsubscription.sqlitedb
 # Datasource local storage ignored files
 /dataSources/
 /dataSources.local.xml
+.repomix/bundles.json

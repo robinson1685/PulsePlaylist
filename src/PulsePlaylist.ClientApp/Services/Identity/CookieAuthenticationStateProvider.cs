@@ -7,11 +7,8 @@ using PulsePlaylist.Api.Client;
 using PulsePlaylist.Api.Client.Models;
 using PulsePlaylist.ClientApp.Services.JsInterop;
 using Microsoft.AspNetCore.Components.Authorization;
-
-
-
+using Microsoft.AspNetCore.Components;
 using Microsoft.Kiota.Abstractions;
-
 
 namespace PulsePlaylist.ClientApp.Services.Identity;
 
@@ -93,7 +90,7 @@ public class CookieAuthenticationStateProvider(ApiClient apiClient, UserProfileS
                 if (offlineModel)
                 {
                     // Store response in IndexedDB for offline access
-                    await indexedDb.SaveDataAsync(IndexedDbCache.DATABASENAME,request.Email!, request.Email);
+                    await indexedDb.SaveDataAsync(IndexedDbCache.DATABASENAME, request.Email!, request.Email);
                 }
             }
             else if (offlineModel)
@@ -124,40 +121,40 @@ public class CookieAuthenticationStateProvider(ApiClient apiClient, UserProfileS
         }
     }
 
-
     public async Task LogoutAsync(CancellationToken cancellationToken = default)
     {
         await apiClient.Account.Logout.PostAsync(cancellationToken: cancellationToken);
         // need to refresh auth state
         NotifyAuthenticationStateChanged(GetAuthenticationStateAsync());
+        var navigationManager = serviceProvider.GetRequiredService<NavigationManager>();
+        navigationManager.NavigateTo("/", true);
     }
 
     public async Task LoginWithGoogle(string authorizationCode, string state, CancellationToken cancellationToken = default)
     {
         try
         {
-            await apiClient.Account.Google.SignIn.PostAsync(q=>
+            await apiClient.Account.Google.SignIn.PostAsync(q =>
             {
                 q.QueryParameters.Code = authorizationCode;
                 q.QueryParameters.State = state;
             }, cancellationToken);
             NotifyAuthenticationStateChanged(GetAuthenticationStateAsync());
         }
-        catch(ProblemDetails)
+        catch (ProblemDetails)
         {
             // Log and re-throw problem details exception
             throw;
         }
-        catch(ApiException)
+        catch (ApiException)
         {
             // Log and re-throw API exception
             throw;
         }
-        catch(Exception)
+        catch (Exception)
         {
             // Log and re-throw general exception
             throw;
         }
     }
 }
-

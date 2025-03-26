@@ -55,7 +55,7 @@ public static class DependencyInjection
 
     public static void AddCoreServices(this IServiceCollection services, IConfiguration configuration)
     {
-        
+
         // Cookie and Authentication Handlers
         services.AddTransient<CookieHandler>();
         services.AddTransient<WebpushrAuthHandler>();
@@ -129,10 +129,6 @@ public static class DependencyInjection
         // Authentication and Authorization
         services.AddAuthorizationCore();
         services.AddCascadingAuthenticationState();
-        services.AddOidcAuthentication(options =>
-        {
-            configuration.Bind("Local", options.ProviderOptions);
-        });
         services.AddScoped<AuthenticationStateProvider, CookieAuthenticationStateProvider>();
         services.AddScoped(sp => (ISignInManagement)sp.GetRequiredService<AuthenticationStateProvider>());
 
@@ -149,4 +145,3 @@ public static class DependencyInjection
         CultureInfo.DefaultThreadCurrentUICulture = culture;
     }
 }
-
