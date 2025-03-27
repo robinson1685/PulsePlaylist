@@ -1,0 +1,99 @@
+# PulsePlaylist - AI Collaboration Rules (`clinerules.md`)
+
+**Version:** 1.0
+**Last Updated:** March 27, 2025
+
+## 1. Purpose
+
+This file provides persistent instructions for AI assistants collaborating on the PulsePlaylist project. Adherence to these rules ensures consistency, maintainability, security, and alignment with the project's architecture and technology stack. Assume all context from `projectbrief.md`, `productContext.md`, `techContext.md`, `systempatterns.md`, `progress.md`, and `activeContext.md` is available. **Focus suggestions on implementing the current MVP phase as defined in `projectbrief.md` unless explicitly asked otherwise.**
+
+## 2. Core Principles
+
+- **Clean Architecture First:** All generated code _must_ respect Clean Architecture boundaries. The `Domain` layer must have zero external dependencies (especially UI or Infrastructure frameworks like ASP.NET Core Identity or EF Core types). `Infrastructure` implements `Application` interfaces. API/UI depends on `Application`/`Infrastructure` setup.
+- **Test-Driven Development (TDD) is Mandatory:** For any feature implementation or business logic:
+  - **Always provide unit tests (xUnit) first or alongside the implementation code.**
+  - Tests should cover happy paths, edge cases, and error conditions using clear Arrange-Act-Assert structure.
+  - Use **FluentAssertions** for assertions. Consider **Verify** (snapshot testing) for complex output verification (e.g., generated playlists, API responses) where appropriate.
+  - Use **NSubstitute** (preferred) or Moq for mocking dependencies in unit tests.
+  - For data access or API layers, provide **integration test** structures using **TestContainers (`Testcontainers.PostgreSql`)** or `WebApplicationFactory`. Ensure tests are independent and use isolated data.
+  - For AI/ML components, include unit tests for core algorithms/rules and integration tests against the service API (potentially using deterministic inputs/mocked models initially).
+- **Security by Design:** Apply secure coding principles (inspired by OWASP guidelines) in all code. Explicitly mention security implications and mitigations (input validation, output encoding, auth checks, dependency scanning).
+- **Developer Experience & Maintainability:** Prioritize solutions that are maintainable, clear, readable, and avoid unnecessary complexity for the current MVP phase. Favor built-in framework features over overly complex custom abstractions. Add concise XML comments for public APIs and non-obvious logic.
+- **Follow Established Context:** Base all suggestions _strictly_ on the information provided in the referenced context markdown files. **Do not introduce unrequested technologies or patterns.**
+
+## 3. C# and .NET Guidelines
+
+- **Language Version:** Use **C# 12** features confidently (primary constructors, collection expressions, `ArgumentNullException.ThrowIfNull`, etc.). Consider C# 13+ preview features only if they offer a substantial, non-breaking improvement for the specific task and are well-supported.
+- **Style:** Follow official Microsoft .NET coding conventions (PascalCase for public members/types, camelCase for locals/private fields, `_prefix` for private instance fields). Use `required` properties and `init`-only setters for immutability (DTOs, Value Objects). Use `var` when type is obvious. Favor expression-bodied members for simple, single-line methods/properties.
+- **Async/Await:** Use `async`/`await` correctly for all I/O. Use `ValueTask` only if profiling shows a clear benefit for frequently completed synchronous paths (e.g., cache hits). Propagate `CancellationToken` consistently through I/O and potentially long-running CPU-bound operations. Use `IAsyncDisposable`.
+- **LINQ:** Use LINQ efficiently. Prefer method syntax generally. Ensure queries are translatable by EF Core where applicable and performant (use projection, avoid N+1).
+- **Nullability:** Enable and respect nullable reference types (`#nullable enable`). Treat unexpected `null`s primarily as programming errors (validate inputs at boundaries). Use `ArgumentNullException.ThrowIfNull` and null-conditional operators (`?.`, `??`), and proper validation at boundaries
+- **Records:** Use records primarily for DTOs and immutable Value Objects. Prefer primary constructor syntax.
+- **Dependency Injection:** Use ASP.NET Core built-in DI. Register services with correct lifetimes (Scoped for request-bound, Singleton for stateless, Transient for lightweight). Use `KeyedServices` if needing to differentiate between multiple implementations of the same interface. Consider `Scrutor` for convention-based registration if the number of services becomes large.
+
+## 4. Specific Technology Rules
+
+- **ASP.NET Core Minimal APIs:**
+  - Use `MapGroup` for organization. Use Minimal API filters for cross-cutting concerns (validation, logging).
+  - Use strongly-typed results (`Results<Ok<T>, NotFound>`).
+  - Generate OpenAPI spec via built-in features (`WithOpenApi()`) using XML comments. Surface documentation via **Scalar UI** (`MapOpenApiScalar`).
+  - Use built-in JSON source generation (`JsonSerializerContext`) for performance optimization.
+- **Entity Framework Core 9 & PostgreSQL:**
+  - Use `Npgsql.EntityFrameworkCore.PostgreSQL`.
+  - Define entity configurations using `IEntityTypeConfiguration<T>` (Fluent API) in `Infrastructure`.
+  - Utilize PostgreSQL features (e.g., `jsonb`, `GIN` indexes, Full-Text Search) via EF Core configurations.
+  - **Strictly avoid `FromSqlRaw`**. Use `FromSqlInterpolated` or preferably parameterized `ExecuteSql*` methods only when complex PG functions/features cannot be mapped via LINQ or `EF.Functions`. Prioritize LINQ.
+  - Use performance patterns: `AsNoTracking()` for reads, `AsSplitQuery()` for complex includes, projection (`Select`). Use compiled queries (`EF.CompileAsyncQuery`) for critical read paths.
+  - Implement `ApplicationDbContext` **extending** `IdentityDbContext<ApplicationUser>` in `Infrastructure`.
+  - Manage schema via EF Core Migrations located within `Infrastructure`. Configure `AppHost` or `API` startup to apply migrations automatically (useful for dev/testing, consider manual application for production).
+- **ASP.NET Core Identity:**
+  - Configure Identity using the PostgreSQL EF Core store (`AddEntityFrameworkStores<ApplicationDbContext>`).
+  - Use `UserManager<ApplicationUser>` and `SignInManager<ApplicationUser>` for user operations within Application/API layers.
+  - Link domain `User` to `ApplicationUser` via a non-nullable foreign key (`IdentityId`) established during registration. Ensure operations spanning both can occur within a transaction (handled by sharing the `DbContext`).
+  - Use **standard email/password and OAuth (Spotify, Google) flows** for MVP.
+  - Configure secure Identity options (password complexity, lockout).
+  - Implement authorization using `[Authorize]` attributes and potentially custom policies.
+  - Use built-in Rate Limiting middleware, especially on auth endpoints.
+- **MediatR and CQRS:**
+  - Use Commands/Queries/Handlers pattern.
+  - Apply pipeline behaviors (`IPipelineBehavior<,>`) for Validation (FluentValidation), Caching (FusionCache), Logging, potentially Unit of Work or transaction management.
+  - Publish Domain Events via MediatR from `DbContext.SaveChangesAsync` override or an EF Core interceptor.
+- **Validation and Error Handling:**
+  - Use **FluentValidation** for DTOs/Commands, integrated via MediatR pipeline.
+  - Implement global exception handling middleware mapping exceptions to **Problem Details (RFC 7807)** responses. Log unhandled exceptions using Serilog.
+- **Blazor (Web & MAUI Hybrid):**
+  - Use **Blazor Web App (Auto mode)** and **MAUI Blazor Hybrid**.
+  - Use **MudBlazor** components consistently. Apply virtualization for lists.
+  - Use standard Blazor state management (Cascading Parameters, Scoped Services). Avoid complex state libraries initially.
+  - Use CSS isolation. Configure MudBlazor theming (Light/Dark).
+  - Implement PWA features for Web App. Use **IndexedDB** (e.g., via `Microsoft.JSInterop`) for essential client-side caching/offline data in Mobile/Web.
+  - Implement **MAUI platform-specific code** in `Platforms` folders for HealthKit/Connect access.
+- **SignalR:**
+  - Use strongly-typed Hubs in the API layer.
+  - Implement resilient clients (`HubConnectionBuilder.WithAutomaticReconnect`) in frontends.
+  - Apply `[Authorize]` attributes to Hubs/methods.
+- **.NET Aspire:**
+  - Use `AppHost` to orchestrate development environment (API, Web, ML container, Postgres container, Redis container).
+  - Utilize Aspire Dashboard for dev monitoring.
+  - Define resources (`AddPostgres`, `AddRedis`, `AddProject`, `AddContainer`) and connection strings/service discovery. Use `ServiceDefaults`.
+- **Python ML Service (`AdaptationEngine`):**
+  - Use **Python 3.12+**. Implement with **FastAPI** and `asyncio`.
+  - Containerize using multi-stage `Dockerfile`.
+  - Implement health check endpoint (`/health`).
+  - Integrate **OpenTelemetry** for tracing/metrics.
+  - Initial implementation uses rules; PyTorch integration is post-MVP.
+- **Observability Stack:**
+  - Configure **OpenTelemetry** via Aspire `ServiceDefaults`.
+  - Configure **Serilog** for structured logging, outputting to Console and OpenTelemetry (via OTLP exporter).
+  - Ensure logs/traces/metrics flow via OTLP to a backend suitable for **Grafana** visualization (e.g., Loki/Tempo/Prometheus or Azure Monitor).
+
+## 5. Output Format & Expectations
+
+- **Code:** Provide complete, runnable, modern C# 12 / Python 3.12+ code blocks. Include necessary `using`/`import` statements. Explain rationale for non-obvious code or patterns.
+- **Tests:** Provide corresponding xUnit/pytest tests following TDD (Arrange-Act-Assert). Use FluentAssertions/NSubstitute. Clearly state test purpose. Provide integration test setup using TestContainers/WebApplicationFactory where appropriate.
+- **Architecture:** Explain how suggestions fit into Clean Architecture and reference patterns in `systempatterns.md`. Discuss trade-offs briefly.
+- **Performance:** Mention performance considerations (query optimization, async, caching).
+- **Security:** Highlight security best practices implemented or needed (input validation, auth checks, parameterization, secrets management).
+- **Completeness & MVP Focus:** Address the request fully for the **current MVP phase**. Handle common edge cases and errors. Acknowledge post-MVP considerations where relevant but don't implement them unless asked.
+
+By adhering to these rules, the AI assistant can provide high-quality, consistent, secure, and modern code/guidance aligned with the PulsePlaylist project's specific needs and best practices for 2025 development.
