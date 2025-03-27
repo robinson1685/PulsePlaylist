@@ -24,12 +24,37 @@
     - Expert assessment reviewed, confirming feasibility and highlighting key risks (esp. YouTube Music).
 4.  **Initial Tooling & Prompts:**
     - Detailed, context-rich prompts generated for guiding the implementation of Phase 1 (Domain), Phase 2 (Data Access), and Phase 3 (API).
+5.  ### Phase 1: Domain Model Implementation (2025-03-28)
+
+- Implemented core domain entities:
+  - Track with Spotify metadata
+  - AudioFeatures for BPM, energy, valence
+  - WorkoutIntensity value object
+- Created comprehensive test suite
+- Documented domain model design decisions
+- Validated all business rules
+
+### Test Infrastructure v2 (2025-03-28)
+
+- ✅ Restructured test projects according to Clean Architecture:
+  - PulsePlaylist.Domain.Tests for business logic
+  - PulsePlaylist.Integration.Tests for system tests
+- ✅ Migrated existing tests:
+  - 38 Domain tests
+  - 104 Integration tests
+- ✅ Implemented base test classes:
+  - IntegrationTestBase for Aspire orchestration
+  - ApiTestBase with auth workflow
+- ✅ Established standardized test patterns
+- ✅ Removed legacy test project
+- ✅ Updated solution structure and references
 
 ## What's Left to Build (Remaining Tasks by Phase - MVP Focus)
 
-- **Phase 1: Core Domain Model (In Progress)**
+<!-- - **Phase 1: Core Domain Model (In Progress)**
   - Complete implementation of all entities (`User`, `Track`, `AudioFeatures`, `Playlist`, `WorkoutSession`), value objects (`WorkoutIntensity`, `PlaylistSettings`), domain events, domain exceptions, and domain services (`PlaylistCurationService`, `WorkoutAnalysisService`, `SpotifyMusicMetadataService`).
-  - Ensure full unit test coverage for the Domain layer.
+  - Ensure full unit test coverage for the Domain layer. -->
+
 - **Phase 2: Data Access Layer**
   - Verify `ApplicationDbContext` extending `IdentityDbContext<ApplicationUser>` for PostgreSQL.
   - Configure EF Core entities and relationships (using Fluent API) for domain models.

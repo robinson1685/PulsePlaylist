@@ -63,4 +63,17 @@ This document outlines the key architectural patterns, design decisions, and com
 - **Shared Library (`Shared`):** Contains Razor components (MudBlazor based), DTOs (potentially), and client-side logic/services used by both `PulsePlaylist.Web` and `PulsePlaylist.Mobile`.
 - **Identity & Domain Integration:** ASP.NET Core Identity entities are likely stored within the same PostgreSQL database as domain entities (managed by `ApplicationDbContext` which extends `IdentityDbContext` links to my ApplicationUser), allowing for transactions that span both, possibly linked via User IDs.
 
+## 5. Test Architecture
+
+```mermaid
+flowchart TD
+    A[Testing] --> B[Domain.Tests]
+    A --> C[Integration.Tests]
+    B --> D[Entity Validation]
+    B --> E[Business Rules]
+    C --> F[API Endpoints]
+    C --> G[UI Flows]
+    C --> H[Database Integration]
+```
+
 This structure promotes modularity, testability, and scalability, allowing different parts of the system to evolve independently while adhering to defined contracts and interfaces.

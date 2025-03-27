@@ -8,29 +8,27 @@
     <IsTestProject>true</IsTestProject>
   </PropertyGroup>
 
-
   <ItemGroup>
     <PackageReference Include="Aspire.Hosting.Testing" Version="9.1.0" />
+    <PackageReference Include="FluentAssertions" Version="6.12.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.13.0" />
-    <PackageReference Include="NUnit" Version="4.3.2" />
-    <PackageReference Include="NUnit.Analyzers" Version="4.6.0">
+    <PackageReference Include="xunit" Version="2.7.0" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.5.7">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="NUnit3TestAdapter" Version="5.0.0" />
   </ItemGroup>
 
-
   <ItemGroup>
+    <ProjectReference Include="..\..\src\PulsePlaylist.Api\PulsePlaylist.Api.csproj" />
     <ProjectReference Include="..\..\src\PulsePlaylist.AppHost\PulsePlaylist.AppHost.csproj" />
+    <ProjectReference Include="..\..\src\PulsePlaylist.WebApp\PulsePlaylist.WebApp.csproj" />
   </ItemGroup>
 
   <ItemGroup>
+    <Using Include="Xunit" />
+    <Using Include="FluentAssertions" />
     <Using Include="System.Net" />
-    <Using Include="Microsoft.Extensions.DependencyInjection" />
-    <Using Include="Aspire.Hosting.ApplicationModel" />
-    <Using Include="Aspire.Hosting.Testing" />
-    <Using Include="NUnit.Framework" />
   </ItemGroup>
 
 </Project>

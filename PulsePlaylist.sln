@@ -34,13 +34,15 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Migrators.SQLite", "src\Mig
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{0AB3BF05-4346-4AA6-1389-037BE0695223}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PulsePlaylist.Tests", "tests\PulsePlaylist.Tests\PulsePlaylist.Tests.csproj", "{184DD222-E87D-65E3-4E4F-ADC8680E2D81}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PulsePlaylist.Domain.Tests", "tests\PulsePlaylist.Domain.Tests\PulsePlaylist.Domain.Tests.csproj", "{184DD222-E87D-65E3-4E4F-ADC8680E2D81}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PulsePlaylist.WebApp", "src\PulsePlaylist.WebApp\PulsePlaylist.WebApp.csproj", "{E29307F2-485B-47B4-9CA7-A7EA6949134B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PulsePlaylist.Integration.Tests", "tests\PulsePlaylist.Integration.Tests\PulsePlaylist.Integration.Tests.csproj", "{E29307F2-485B-47B4-9CA7-A7EA6949134B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PulsePlaylist.Mobile", "PulsePlaylist.Mobile\PulsePlaylist.Mobile.csproj", "{57D26B65-553C-455C-98F5-459F5098DAC0}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PulsePlaylist.WebApp", "src\PulsePlaylist.WebApp\PulsePlaylist.WebApp.csproj", "{57D26B65-553C-455C-98F5-459F5098DAC0}"
 EndProject
-Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "PulsePlaylist.AdaptationEngine", "PulsePlaylist.AdaptationEngine\PulsePlaylist.AdaptationEngine.pyproj", "{C6BBF4E8-D49A-4B69-A2CB-2D37E82DFA6F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PulsePlaylist.Mobile", "src\PulsePlaylist.Mobile\PulsePlaylist.Mobile.csproj", "{13D5C13D-C9DF-4CBB-0909-68D8F85D9457}"
+EndProject
+Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "PulsePlaylist.AdaptationEngine", "src\PulsePlaylist.AdaptationEngine\PulsePlaylist.AdaptationEngine.pyproj", "{D6BBF4E8-D49A-4B69-A2CB-2D37E82DFA6F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -100,8 +102,12 @@ Global
 		{57D26B65-553C-455C-98F5-459F5098DAC0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{57D26B65-553C-455C-98F5-459F5098DAC0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{57D26B65-553C-455C-98F5-459F5098DAC0}.Release|Any CPU.Build.0 = Release|Any CPU
-		{C6BBF4E8-D49A-4B69-A2CB-2D37E82DFA6F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C6BBF4E8-D49A-4B69-A2CB-2D37E82DFA6F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{13D5C13D-C9DF-4CBB-0909-68D8F85D9457}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{13D5C13D-C9DF-4CBB-0909-68D8F85D9457}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{13D5C13D-C9DF-4CBB-0909-68D8F85D9457}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{13D5C13D-C9DF-4CBB-0909-68D8F85D9457}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D6BBF4E8-D49A-4B69-A2CB-2D37E82DFA6F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D6BBF4E8-D49A-4B69-A2CB-2D37E82DFA6F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -119,14 +125,15 @@ Global
 		{7D6E47CC-90F1-4C19-AF96-1DE7EED7928C} = {C983071D-42D7-4326-A379-CE622E29D307}
 		{67226F2C-5D75-4B76-B5F8-E42A4BC1BBB1} = {C983071D-42D7-4326-A379-CE622E29D307}
 		{184DD222-E87D-65E3-4E4F-ADC8680E2D81} = {0AB3BF05-4346-4AA6-1389-037BE0695223}
-		{E29307F2-485B-47B4-9CA7-A7EA6949134B} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
+		{E29307F2-485B-47B4-9CA7-A7EA6949134B} = {0AB3BF05-4346-4AA6-1389-037BE0695223}
 		{57D26B65-553C-455C-98F5-459F5098DAC0} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
-		{C6BBF4E8-D49A-4B69-A2CB-2D37E82DFA6F} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
+		{13D5C13D-C9DF-4CBB-0909-68D8F85D9457} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
+		{D6BBF4E8-D49A-4B69-A2CB-2D37E82DFA6F} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {C379C278-2AFA-4DD5-96F5-34D17AAE1188}
-		RESX_AutoCreateNewLanguageFiles = True
-		RESX_ConfirmAddLanguageFile = True
 		RESX_ShowPerformanceTraces = True
+		RESX_ConfirmAddLanguageFile = True
+		RESX_AutoCreateNewLanguageFiles = True
+		SolutionGuid = {C379C278-2AFA-4DD5-96F5-34D17AAE1188}
 	EndGlobalSection
 EndGlobal
