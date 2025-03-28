@@ -77,3 +77,25 @@ flowchart TD
 ```
 
 This structure promotes modularity, testability, and scalability, allowing different parts of the system to evolve independently while adhering to defined contracts and interfaces.
+
+## 6. Architectural Decisions
+
+### Identity Implementation Strategy
+
+#### ApplicationUser Location Decision
+- **Context**: ApplicationUser class inherits from IdentityUser (ASP.NET Core Identity)
+- **Decision**: Place ApplicationUser in Infrastructure layer despite having domain properties
+- **Rationale**:
+  1. Maintains Clean Architecture principles while acknowledging practical framework needs
+  2. Prevents Domain layer from taking framework dependencies
+  3. Enables seamless integration with ASP.NET Core Identity features
+  4. Simplifies authentication and user management workflows
+
+#### Implementation Guidelines
+- Domain layer remains framework-independent
+- Business logic stays in Domain services
+- Application layer handles mapping between Domain.User and Infrastructure.ApplicationUser
+- Identity-related services are confined to Infrastructure layer
+- Clear documentation maintains architectural clarity
+
+This compromise balances architectural purity with practical development needs while maintaining system integrity.

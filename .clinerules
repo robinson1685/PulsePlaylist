@@ -3,6 +3,8 @@
 **Version:** 1.0
 **Last Updated:** March 27, 2025
 
+## 0. All terminal commands will use powershell
+
 ## 1. Purpose
 
 This file provides persistent instructions for AI assistants collaborating on the PulsePlaylist project. Adherence to these rules ensures consistency, maintainability, security, and alignment with the project's architecture and technology stack. Assume all context from `projectbrief.md`, `productContext.md`, `techContext.md`, `systempatterns.md`, `progress.md`, and `activeContext.md` is available. **Focus suggestions on implementing the current MVP phase as defined in `projectbrief.md` unless explicitly asked otherwise.**
@@ -14,7 +16,7 @@ This file provides persistent instructions for AI assistants collaborating on th
   - **Always provide unit tests (xUnit) first or alongside the implementation code.**
   - Tests should cover happy paths, edge cases, and error conditions using clear Arrange-Act-Assert structure.
   - Use **FluentAssertions** for assertions. Consider **Verify** (snapshot testing) for complex output verification (e.g., generated playlists, API responses) where appropriate.
-  - Use **NSubstitute** (preferred) or Moq for mocking dependencies in unit tests.
+  - Use Moq for mocking dependencies in unit tests.
   - For data access or API layers, provide **integration test** structures using **TestContainers (`Testcontainers.PostgreSql`)** or `WebApplicationFactory`. Ensure tests are independent and use isolated data.
   - For AI/ML components, include unit tests for core algorithms/rules and integration tests against the service API (potentially using deterministic inputs/mocked models initially).
 - **Security by Design:** Apply secure coding principles (inspired by OWASP guidelines) in all code. Explicitly mention security implications and mitigations (input validation, output encoding, auth checks, dependency scanning).

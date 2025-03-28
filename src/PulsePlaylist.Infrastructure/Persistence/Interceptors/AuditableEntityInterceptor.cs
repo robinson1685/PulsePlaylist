@@ -23,12 +23,12 @@ public class AuditableEntityInterceptor : SaveChangesInterceptor
     /// <summary>
     /// Initializes a new instance of the <see cref="AuditableEntityInterceptor"/> class.
     /// </summary>
-    /// <param name="currentUserService">The current user service.</param>
+    /// <param name="serviceProvider">The service provider.</param>
     /// <param name="dateTime">The date and time service.</param>
     public AuditableEntityInterceptor(IServiceProvider serviceProvider, IDateTime dateTime)
     {
         _currentUserAccessor = serviceProvider.GetRequiredService<ICurrentUserAccessor>();
-        _dbContextFactory= serviceProvider.GetRequiredService<IDbContextFactory<ApplicationDbContext>>();
+        _dbContextFactory = serviceProvider.GetRequiredService<IDbContextFactory<ApplicationDbContext>>();
         _dateTime = dateTime;
     }
 
@@ -57,6 +57,7 @@ public class AuditableEntityInterceptor : SaveChangesInterceptor
         }
         return saveResult;
     }
+
     public override async Task SaveChangesFailedAsync(DbContextErrorEventData eventData, CancellationToken cancellationToken = default)
     {
         await base.SaveChangesFailedAsync(eventData, cancellationToken);
@@ -64,16 +65,15 @@ public class AuditableEntityInterceptor : SaveChangesInterceptor
         var exception = eventData.Exception;
         if (context != null)
         {
-            var errorMessage = exception.InnerException!=null? exception.InnerException.Message:exception.Message;
+            var errorMessage = exception.InnerException != null ? exception.InnerException.Message : exception.Message;
             foreach (var auditTrail in _temporaryAuditTrailList)
             {
                 auditTrail.ErrorMessage = errorMessage;
             }
             await SaveAuditTrailsWithNewContextAsync(_temporaryAuditTrailList, cancellationToken);
         }
-
-       
     }
+
     private void UpdateAuditableEntities(DbContext context)
     {
         var userId = _currentUserAccessor.UserId;
@@ -122,7 +122,8 @@ public class AuditableEntityInterceptor : SaveChangesInterceptor
         if (entry.Entity is ISoftDelete softDelete)
         {
             softDelete.DeletedBy = userId;
-            softDelete.Deleted = now;
+            softDelete.Deleted = now; // Updated from DeletedAt to match the ISoftDelete interface
+            softDelete.IsDeleted = true;
             entry.State = EntityState.Modified;
         }
     }
@@ -133,11 +134,11 @@ public class AuditableEntityInterceptor : SaveChangesInterceptor
         var now = _dateTime.Now;
         var auditTrails = new List<AuditTrail>();
 
-        foreach (var entry in context.ChangeTracker.Entries<IAuditTrial>())
+        foreach (var entry in context.ChangeTracker.Entries<IAuditTrail>())
         {
             if (IsValidAuditEntry(entry))
             {
-                var auditTrail = CreateAuditTrail(entry, userId, now,entry.DebugView.LongView);
+                var auditTrail = CreateAuditTrail(entry, userId, now, entry.DebugView.LongView);
                 auditTrails.Add(auditTrail);
             }
         }
@@ -150,11 +151,11 @@ public class AuditableEntityInterceptor : SaveChangesInterceptor
         return entry.Entity is not AuditTrail && entry.State != EntityState.Detached && entry.State != EntityState.Unchanged;
     }
 
-    private AuditTrail CreateAuditTrail(EntityEntry entry, string userId, DateTime now,string? debugView)
+    private AuditTrail CreateAuditTrail(EntityEntry entry, string userId, DateTime now, string? debugView)
     {
         var auditTrail = new AuditTrail
         {
-            Id=Guid.CreateVersion7().ToString(),
+            Id = Guid.CreateVersion7().ToString(),
             TableName = entry.Entity.GetType().Name,
             UserId = userId,
             DateTime = now,
@@ -227,6 +228,7 @@ public class AuditableEntityInterceptor : SaveChangesInterceptor
             _temporaryAuditTrailList.Clear();
         }
     }
+
     private async Task SaveAuditTrailsWithNewContextAsync(List<AuditTrail> auditTrails, CancellationToken cancellationToken)
     {
         if (_temporaryAuditTrailList.Any())

@@ -3,24 +3,13 @@
 
 namespace PulsePlaylist.Domain.Common;
 
+/// <summary>
+/// Base class for all auditable entities
+/// </summary>
 public abstract class BaseAuditableEntity : BaseEntity, IAuditableEntity
 {
-    public virtual DateTime? Created { get; set; }
-
-    public virtual string? CreatedBy { get; set; }
-
-    public virtual DateTime? LastModified { get; set; }
-
-    public virtual string? LastModifiedBy { get; set; }
-}
-
-public interface IAuditableEntity
-{
-    DateTime? Created { get; set; }
-
-    string? CreatedBy { get; set; }
-
-   DateTime? LastModified { get; set; }
-
-    string? LastModifiedBy { get; set; }
+    public DateTime? Created { get; set; }
+    public string? CreatedBy { get; set; }
+    public DateTime? LastModified { get; set; }
+    public string? LastModifiedBy { get; set; }
 }

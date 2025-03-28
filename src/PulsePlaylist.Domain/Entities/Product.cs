@@ -1,11 +1,11 @@
+// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+
 using PulsePlaylist.Domain.Common;
 
 namespace PulsePlaylist.Domain.Entities;
 
-/// <summary>
-/// Represents a product entity.
-/// </summary>
-public class Product : BaseAuditableEntity, IAuditTrial
+public class Product : BaseEntity, IAuditTrail
 {
     /// <summary>
     /// Gets or sets the SKU of the product.
@@ -41,6 +41,11 @@ public class Product : BaseAuditableEntity, IAuditTrial
     /// Gets or sets the unit of measure of the product.
     /// </summary>
     public string? UOM { get; set; }
+
+    public DateTimeOffset? Created { get; set; }
+    public string? CreatedBy { get; set; }
+    public DateTimeOffset? LastModified { get; set; }
+    public string? LastModifiedBy { get; set; }
 }
 
 

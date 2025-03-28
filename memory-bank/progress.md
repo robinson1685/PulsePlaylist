@@ -6,7 +6,7 @@
 ## Current Status
 
 - **Active Phase:** Phase 1: Core Domain Model Setup.
-- **Current Tasks:** Implementing domain entities (`User`, `Track`, `AudioFeatures`), value objects (`WorkoutIntensity`, `PlaylistSettings`), domain events, domain exceptions, and associated unit tests (`PulsePlaylist.Domain.Tests`) using a Test-Driven Development (TDD) approach.
+- **Current Tasks:** Implementing domain entities (`Playlist`, `PlaylistItem`, `Track`, `AudioFeatures`), value objects (`WorkoutIntensity`, `PlaylistSettings`, `PlaylistId`), domain events, domain exceptions, and associated unit tests (`PulsePlaylist.Domain.Tests`) using a Test-Driven Development (TDD) approach.
 - **Methodology:** Writing tests first in xUnit/FluentAssertions, then implementing the domain logic to make the tests pass, following Clean Architecture and DDD principles.
 - **Immediate Next Step:** Complete Phase 1 implementation (including domain services) and prepare to start Phase 2 (Data Access Layer).
 
