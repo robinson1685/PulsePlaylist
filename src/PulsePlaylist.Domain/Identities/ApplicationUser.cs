@@ -5,6 +5,8 @@
 
 using PulsePlaylist.Domain.Common;
 using Microsoft.AspNetCore.Identity;
+using PulsePlaylist.Domain.Entities;
+using PulsePlaylist.Domain.ValueObjects;
 
 namespace PulsePlaylist.Domain.Identities;
 
@@ -24,6 +26,6 @@ public class ApplicationUser : IdentityUser, IAuditableEntity
     public string? CreatedBy { get; set; }
     public DateTime? LastModified { get; set; }
     public string? LastModifiedBy { get; set; }
+    public PlaylistSettings Settings { get; set; } = PlaylistSettings.CreateDefault();
+    public List<WorkoutSession> WorkoutSessions { get; private set; } = new();
 }
-
-

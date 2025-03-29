@@ -44,7 +44,6 @@ public static class DependencyInjection
             .AddDatabase(configuration)
             .AddFusionCacheService()
             .AddScoped<IUploadService, MinioUploadService>();
- 
 
         return services;
     }

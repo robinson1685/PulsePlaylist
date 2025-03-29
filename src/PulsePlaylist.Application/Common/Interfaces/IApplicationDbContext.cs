@@ -1,4 +1,4 @@
-namespace PulsePlaylist.Application.Common.Interfaces;
+﻿namespace PulsePlaylist.Application.Common.Interfaces;
 
 /// <summary>
 /// Represents the application database context interface.
@@ -24,6 +24,8 @@ public interface IApplicationDbContext
     /// Gets or sets the Stocks DbSet.
     /// </summary>
     DbSet<Stock> Stocks { get; set; }
+
+    DbSet<WorkoutSession> WorkoutSessions { get; }
 
     /// <summary>
     /// Saves all changes made in this context to the database.

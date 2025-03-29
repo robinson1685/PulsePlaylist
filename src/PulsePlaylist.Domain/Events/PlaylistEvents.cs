@@ -5,11 +5,11 @@ namespace PulsePlaylist.Domain.Events;
 
 public class PlaylistItemReorderedEvent : DomainEvent
 {
-    public PlaylistId PlaylistId { get; }
+    public string PlaylistId { get; }
     public string PlaylistItemId { get; }
     public int NewPosition { get; }
 
-    public PlaylistItemReorderedEvent(PlaylistId playlistId, string playlistItemId, int newPosition)
+    public PlaylistItemReorderedEvent(string playlistId, string playlistItemId, int newPosition)
     {
         PlaylistId = playlistId;
         PlaylistItemId = playlistItemId;
@@ -19,10 +19,10 @@ public class PlaylistItemReorderedEvent : DomainEvent
 
 public class PlaylistItemAddedEvent : DomainEvent
 {
-    public PlaylistId PlaylistId { get; }
+    public string PlaylistId { get; }
     public string PlaylistItemId { get; }
 
-    public PlaylistItemAddedEvent(PlaylistId playlistId, string playlistItemId)
+    public PlaylistItemAddedEvent(string playlistId, string playlistItemId)
     {
         PlaylistId = playlistId;
         PlaylistItemId = playlistItemId;
@@ -31,10 +31,10 @@ public class PlaylistItemAddedEvent : DomainEvent
 
 public class PlaylistItemRemovedEvent : DomainEvent
 {
-    public PlaylistId PlaylistId { get; }
+    public string PlaylistId { get; }
     public string PlaylistItemId { get; }
 
-    public PlaylistItemRemovedEvent(PlaylistId playlistId, string playlistItemId)
+    public PlaylistItemRemovedEvent(string playlistId, string playlistItemId)
     {
         PlaylistId = playlistId;
         PlaylistItemId = playlistItemId;
@@ -43,9 +43,9 @@ public class PlaylistItemRemovedEvent : DomainEvent
 
 public class PlaylistUpdatedEvent : DomainEvent
 {
-    public PlaylistId PlaylistId { get; }
+    public string PlaylistId { get; }
 
-    public PlaylistUpdatedEvent(PlaylistId playlistId)
+    public PlaylistUpdatedEvent(string playlistId)
     {
         PlaylistId = playlistId;
     }

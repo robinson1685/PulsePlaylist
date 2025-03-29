@@ -1,6 +1,6 @@
 # PulsePlaylist - Technical Context
 
-**Last Updated:** March 27, 2025
+**Last Updated:** March 29, 2025
 **Based On:** Detailed Architecture & Stack Description Provided
 
 This document outlines the key technologies, development setup, constraints, and dependencies for the PulsePlaylist application.
@@ -14,12 +14,37 @@ This document outlines the key technologies, development setup, constraints, and
 - **Application Logic:** Mediator pattern (`MediatR`) for CQRS
 - **Authentication:** ASP.NET Core Identity
 - **Real-time:** SignalR
+- **ID Strategy:** String-based GUIDs for compatibility with ASP.NET Core Identity and external services
 
 ### Database & Data Access
 
-- **Database:** PostgreSQL
-- **ORM:** Entity Framework Core 9 with `Npgsql.EntityFrameworkCore.PostgreSQL` provider
-- **Migrations:** EF Core Migrations (managed within Infrastructure project)
+- **Development:** SQLite for local development and testing
+- **Production:** PostgreSQL for production deployment
+- **ORM:** Entity Framework Core 9 with provider-specific implementations:
+  - `Microsoft.EntityFrameworkCore.Sqlite` for development
+  - `Npgsql.EntityFrameworkCore.PostgreSQL` for production
+- **Migrations:** Provider-specific migrations managed in separate projects (see `systemPatterns.md` for details):
+  - `Migrators.SQLite` for development
+  - `Migrators.PostgreSQL` for production
+  - Common migration naming pattern: `{Purpose}_{DatabaseType}`
+- **Migration Commands:**
+  ```powershell
+  # Add new migration
+  dotnet ef migrations add {MigrationName} --project src\Migrators\Migrators.PostgreSQL --startup-project src\PulsePlaylist.Api
+
+  # Apply migrations
+  dotnet ef database update --project src\Migrators\Migrators.PostgreSQL --startup-project src\PulsePlaylist.Api
+
+  # Generate SQL script (for review)
+  dotnet ef migrations script --project src\Migrators\Migrators.PostgreSQL --startup-project src\PulsePlaylist.Api
+  ```
+  Key considerations:
+  - Replace `Migrators.PostgreSQL` with `Migrators.SQLite` or `Migrators.MSSQL` based on target database
+  - Use descriptive migration names (e.g., `AddPlaylistEntity`, `UpdateTrackSchema`)
+  - EF Core CLI tools required: `dotnet tool install --global dotnet-ef`
+
+- **Entity Configurations:** Database-agnostic configurations with provider-specific overrides
+
 
 ### Frontend
 
@@ -62,7 +87,7 @@ This document outlines the key technologies, development setup, constraints, and
 - **Validation:** FluentValidation
 - **Mapping:** AutoMapper
 - **Logging:** Serilog (structured logging, sinks for Console, File, OpenTelemetry)
-- **Observability:** **OpenTelemetry** (Tracing & Metrics), visualized with **Grafana** (likely with Loki/Tempo/Prometheus backend)
+- **Observability:** **OpenTelemetry** (Tracing & Metrics), visualized with **Grafana**
 
 ## 2. Development Setup
 
@@ -70,7 +95,8 @@ This document outlines the key technologies, development setup, constraints, and
   - Visual Studio 2022 (Latest Preview for .NET 9 Recommended) or compatible IDE
   - .NET 9 SDK
   - Python 3.12+ (with pip)
-  - PostgreSQL instance (Local installation or run via Docker/Aspire)
+  - SQLite for development
+  - PostgreSQL for production
   - Docker Desktop
   - (MAUI): Platform SDKs (Android SDK, Xcode on macOS for iOS)
 - **Build Process & Philosophy:**
@@ -81,8 +107,9 @@ This document outlines the key technologies, development setup, constraints, and
 - **Testing Strategy:**
   - Test-Driven Development (TDD) workflow preferred.
   - **Unit Tests:** xUnit for test framework, FluentAssertions for assertions, Moq for mocking dependencies.
-  - **Integration Tests:** xUnit, **TestContainers (`Testcontainers.PostgreSql`)** for isolated database testing.
-  - Dedicated test projects per architectural layer (`*.Tests`).
+  - **Integration Tests:** xUnit, **TestContainers** for isolated database testing:
+    - SQLite for quick tests
+    - PostgreSQL (`Testcontainers.PostgreSql`) for production-like testing
 
 ## 3. Technical Constraints
 
@@ -93,29 +120,34 @@ This document outlines the key technologies, development setup, constraints, and
 - **Cross-Platform UI Consistency:** Maintain a similar look, feel, and core functionality across iOS, Android, and Web using MAUI Blazor Hybrid, Blazor Web App, and MudBlazor.
 - **Health API Limitations:** Adherence to rules, permissions, and data access patterns of Health Connect (Android) and HealthKit (iOS). Potential differences in data granularity or update frequency.
 - **Music Service API Quotas/Limits:** Careful management of API calls to Spotify (and potential YouTube Music) to avoid rate limiting, especially during real-time adaptation. Dependence on API stability and terms of service. **Spotify Premium requirement** for full playback control.
+- **ID Type Constraints:** Current use of string-based GUIDs for compatibility with ASP.NET Core Identity. This affects:
+  - Database storage and indexing strategies (36-char strings for GUID storage)
+  - Entity relationships and foreign key constraints
+  - API contract design and serialization
+  - Integration with external services
 
 ## 4. Dependencies
 
 ### Key NuGet Packages
 
 - `Microsoft.AspNetCore.*` (Core, Identity, Minimal APIs, **OpenApi**)
-- `Microsoft.AspNetCore.OpenApi.Scalar` _(If using this specific package for Scalar UI)_
-- `Microsoft.EntityFrameworkCore.*` (Core, Npgsql, Design, Tools)
+- `Microsoft.AspNetCore.OpenApi.Scalar`
+- `Microsoft.EntityFrameworkCore.*` (Core, SQLite, Design, Tools)
+- `Npgsql.EntityFrameworkCore.PostgreSQL`
 - `Microsoft.AspNetCore.Identity.EntityFrameworkCore`
 - `MudBlazor`
 - `MediatR` / `MediatR.Extensions.Microsoft.DependencyInjection`
 - `FluentValidation.AspNetCore`
 - `AutoMapper` / `AutoMapper.Extensions.Microsoft.DependencyInjection`
-- `FusionCache` / `FusionCache.Backplane.StackExchangeRedis` _(Optional Redis backplane)_
+- `FusionCache` / `FusionCache.Backplane.StackExchangeRedis`
 - `Microsoft.Extensions.Caching.StackExchangeRedis`
 - `Microsoft.Kiota.Abstractions` / `Microsoft.Kiota.Http.HttpClientLibrary`
 - `Testcontainers.PostgreSql`
 - `Serilog.AspNetCore` / Sinks (Console, File, **Serilog.Sinks.OpenTelemetry**)
 - `OpenTelemetry.Extensions.Hosting` / `OpenTelemetry.Instrumentation.*`
-- `Npgsql` (underlying ADO.NET provider)
 - `Microsoft.AspNetCore.SignalR.Client` (for frontends)
-- `Azure.Storage.Blobs` _(For Azure Blob Storage client)_
-- `Aspire.*` _(Relevant Aspire hosting/resource packages like `Aspire.Hosting`, `Aspire.Npgsql.EntityFrameworkCore`, `Aspire.StackExchange.Redis`)_
+- `Azure.Storage.Blobs`
+- `Aspire.*` packages
 
 ### External Services / APIs
 
@@ -129,5 +161,5 @@ This document outlines the key technologies, development setup, constraints, and
 - **Azure Key Vault:** (Production target for secrets management).
 - **PostgreSQL Database:** (Hosted instance in production, e.g., Azure Database for PostgreSQL).
 
-_(Local development leverages Docker containers for PostgreSQL/Redis managed via .NET Aspire)_
-_(Deployment utilizes Docker, Traefik, and GitHub Actions)_
+_(Local development uses SQLite and Docker containers for Redis managed via .NET Aspire)_
+_(Production deployment utilizes PostgreSQL, Docker, Traefik, and GitHub Actions)_

@@ -1,7 +1,11 @@
-# PulsePlaylist - System Patterns & Architecture
+## 7. Phase 1 Implementation Patterns (Validated March 30, 2025)
 
-**Last Updated:** March 14, 2025
-**Based On:** Detailed Architecture Description Provided
+### Domain Model Patterns
+- **Rich Domain Models:** Implemented with encapsulated behavior and validation
+- **Value Objects:** Used for immutable concepts (PlaylistSettings, WorkoutIntensity)
+- **Domain Events:** Implemented for cross-cutting concerns (PlaylistItemReorderedEvent)
+- **Factory Methods:** Used for complex object creation (PlaylistSettings.Create)
+- **Validation Strategy:** Constructor-based validation with rich error messages
 
 This document outlines the key architectural patterns, design decisions, and component relationships within the PulsePlaylist application.
 
@@ -80,7 +84,61 @@ This structure promotes modularity, testability, and scalability, allowing diffe
 
 ## 6. Architectural Decisions
 
+### Database Strategy
+
+#### Development vs Production
+- **Context**: Need for efficient local development while maintaining production-grade database support
+- **Decision**: Use SQLite for development/testing and PostgreSQL for production
+- **Implementation**:
+  1. Database-agnostic entity configurations
+  2. Provider-specific migrations in separate projects
+  3. Environment-specific DbContext configurations
+
+#### Migration Strategy
+- **Project Structure**: 
+  ```
+    src/Migrators/
+  ├── Migrators.MSSQL/
+  ├── Migrators.PostgreSQL/
+  └── Migrators.SQLite/
+  tests/PulsePlaylist.Domain.Tests/
+  ├── Entities/
+  │   ├── PlaylistTests.cs
+  │   ├── PlaylistItemTests.cs
+  │   ├── TrackTests.cs
+  │   ├── AudioFeaturesTests.cs
+  │   └── WorkoutSessionTests.cs
+  └── ValueObjects/
+      ├── PlaylistSettingsTests.cs
+      └── WorkoutIntensityTests.cs
+  ```
+- **API Project Integration**: Migrations projects referenced in `PulsePlaylist.Api.csproj`
+- **Naming Convention**: `{Purpose}_{DatabaseType}`
+  ```powershell
+  # Example:
+  ConfigureEntityRelationships_SQLite
+  ConfigureEntityRelationships_PostgreSQL
+  ```
+
+#### Configuration Approach
+- **Core Configurations**: Database-agnostic properties
+  ```csharp
+  builder.Property(x => x.Id)
+      .HasMaxLength(36)
+      .IsRequired();
+  ```
+- **Provider-Specific Overrides**: Handled in Migrator projects
+  ```csharp
+  // SQLite
+  property.SetColumnType("TEXT");
+
+  // PostgreSQL
+  property.SetColumnType("uuid")
+         .SetDefaultValueSql("uuid_generate_v7()");
+  ```
+
 ### Identity Implementation Strategy
+
 
 #### ApplicationUser Location Decision
 - **Context**: ApplicationUser class inherits from IdentityUser (ASP.NET Core Identity)
@@ -98,4 +156,73 @@ This structure promotes modularity, testability, and scalability, allowing diffe
 - Identity-related services are confined to Infrastructure layer
 - Clear documentation maintains architectural clarity
 
-This compromise balances architectural purity with practical development needs while maintaining system integrity.
+### ID Type Strategy
+
+#### Current Implementation
+- **Context**: Entity IDs within the system (Track, Playlist, WorkoutSession)
+- **Pattern**: Using string IDs with GUID format
+  ```csharp
+  public virtual string Id { get; set; } = Guid.CreateVersion7().ToString();
+
+#### Migration Generation
+- **Development (SQLite)**:
+  ```powershell
+  cd src/Migrators/Migrators.SQLite
+  dotnet ef migrations add ConfigureEntityRelationships_SQLite --context SqliteDbContext -o Migrations/SQLite
+  ```
+- **Production (PostgreSQL)**:
+  ```powershell
+  cd src/Migrators/Migrators.PostgreSQL
+  dotnet ef migrations add ConfigureEntityRelationships_PostgreSQL --context PostgresDbContext -o Migrations/PostgreSQL
+  ```
+- **Database Configuration**:
+  - MaxLength(36) for all ID fields
+  - Text/UUID type determined by database provider
+  - Consistent foreign key constraints
+- **Rationale**: 
+  1. Compatibility with ASP.NET Core Identity's string-based IDs
+  2. Flexibility in ID representation while maintaining GUID uniqueness
+  3. Easier integration with external services that may use string IDs
+  4. Simpler serialization/deserialization in APIs
+  5. Database provider independence
+
+  - **Test Coverage Types:**
+  1. Constructor Validation Tests
+  2. Business Rule Tests
+  3. Value Object Behavior Tests
+  4. Domain Event Tests
+  5. Edge Case Tests
+  6. Floating-Point Comparison Tests
+
+### Validated Design Decisions
+1. **ID Strategy:** String-based GUIDs for compatibility with ASP.NET Core Identity
+2. **Encapsulation:** Private setters with public methods for state changes
+3. **Collection Handling:** Private collections with public readonly access
+4. **Domain Events:** Raised from within domain entities
+5. **Floating-Point Precision:** Handled via appropriate test assertions
+6. **JSON Serialization:** Implemented for complex value objects
+
+### Clean Architecture Enforcement
+- Domain layer has no external dependencies
+- Entities contain business logic and validation
+- Value objects ensure immutability
+- Domain events provide decoupling
+- All components tested in isolation
+
+#### Database-Specific Considerations
+- **SQLite (Development)**:
+  - TEXT columns for IDs (36 chars)
+  - Standard string indexing
+  - String-based foreign keys
+- **PostgreSQL (Production)**:
+  - UUID type for optimal storage
+  - Native UUID operations and indexing
+  - uuid-ossp extension for UUID v7 support
+
+#### Implementation Guidelines
+- Use consistent 36-character length for all ID properties
+- Apply appropriate indexes for lookup performance
+- Maintain provider-specific migrations
+- Document ID format requirements in API contracts
+- 
+These patterns have been validated through comprehensive test coverage (92 passing tests) and will serve as the foundation for Phase 2 implementation.

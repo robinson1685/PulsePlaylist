@@ -1,7 +1,6 @@
 using PulsePlaylist.Domain.Common;
 using PulsePlaylist.Domain.Enums;
 using PulsePlaylist.Domain.Events;
-using PulsePlaylist.Domain.ValueObjects;
 
 namespace PulsePlaylist.Domain.Entities;
 
@@ -9,10 +8,9 @@ public class Playlist : BaseAuditableEntity
 {
     private readonly List<PlaylistItem> _items = new();
 
-    public PlaylistId PlaylistId { get; private set; }
     public string Name { get; private set; }
     public PlaylistType Type { get; private set; }
-    public Guid OwnerId { get; private set; }
+    public string OwnerId { get; private set; }
     public string? Description { get; private set; }
     public bool IsPublic { get; private set; }
     public string? SpotifyId { get; private set; }
@@ -23,15 +21,15 @@ public class Playlist : BaseAuditableEntity
     private Playlist() { }
 
     public Playlist(
-        PlaylistId playlistId,
+        string id,
         string name,
         PlaylistType type,
-        Guid ownerId,
+        string ownerId,
         string? description = null,
         bool isPublic = false,
         string? spotifyId = null)
     {
-        PlaylistId = playlistId;
+        Id = id;
         Name = name;
         Type = type;
         OwnerId = ownerId;
@@ -57,13 +55,13 @@ public class Playlist : BaseAuditableEntity
 
         var playlistItem = new PlaylistItem(
             Guid.NewGuid().ToString(),
-            PlaylistId,
+            Id,
             track,
             newPosition
         );
 
         _items.Add(playlistItem);
-        AddDomainEvent(new PlaylistItemAddedEvent(PlaylistId, playlistItem.Id));
+        AddDomainEvent(new PlaylistItemAddedEvent(Id, playlistItem.Id));
 
         return playlistItem;
     }
@@ -82,7 +80,7 @@ public class Playlist : BaseAuditableEntity
             remainingItem.UpdatePosition(remainingItem.Position - 1);
         }
 
-        AddDomainEvent(new PlaylistItemRemovedEvent(PlaylistId, playlistItemId));
+        AddDomainEvent(new PlaylistItemRemovedEvent(Id, playlistItemId));
     }
 
     public void ReorderTrack(string playlistItemId, int newPosition)
@@ -126,7 +124,7 @@ public class Playlist : BaseAuditableEntity
         Description = description ?? Description;
         IsPublic = isPublic ?? IsPublic;
 
-        AddDomainEvent(new PlaylistUpdatedEvent(PlaylistId));
+        AddDomainEvent(new PlaylistUpdatedEvent(Id));
     }
 
     public PlaylistItem? GetTrackAtPosition(int position)

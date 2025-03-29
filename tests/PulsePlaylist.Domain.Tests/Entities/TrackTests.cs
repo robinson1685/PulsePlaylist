@@ -99,20 +99,20 @@ public class TrackTests
            .WithMessage("Duration must be greater than 0*");
     }
 
-    // [Fact]
-    // public void Track_WithoutAudioFeatures_ShouldHaveNullAudioFeatures()
-    // {
-    //     // Arrange
-    //     var id = Guid.NewGuid().ToString();
-    //     var spotifyId = "spotify:track:123456";
-    //     var name = "Test Track";
-    //     var artist = "Test Artist";
-    //     var durationMs = 180000;
-    //
-    //     // Act
-    //     var track = new Track(id, spotifyId, name, artist, durationMs);
-    //
-    //     // Assert
-    //     track.AudioFeatures.Should().BeNull();
-    // }
+    [Fact]
+    public void Track_WithoutAudioFeatures_ShouldHaveNullAudioFeatures()
+    {
+        // Arrange
+        var id = Guid.NewGuid().ToString();
+        var spotifyId = "spotify:track:123456";
+        var name = "Test Track";
+        var artist = "Test Artist";
+        var durationMs = 180000;
+
+        // Act
+        var track = new Track(id, spotifyId, name, artist, durationMs);
+
+        // Assert
+        track.Features.Should().BeNull();
+    }
 }

@@ -10,24 +10,47 @@ public class TrackConfiguration : IEntityTypeConfiguration<Track>
     {
         builder.ToTable("Tracks");
 
-        builder.Property(t => t.SpotifyId)
-            .IsRequired()
-            .HasMaxLength(50);
+        // Primary Key Configuration
+        builder.HasKey(x => x.Id);
 
-        builder.HasIndex(t => t.SpotifyId)
+        builder.Property(x => x.Id)
+            .HasMaxLength(36)
+            .IsRequired();
+
+        // Spotify-related properties
+        builder.Property(x => x.SpotifyId)
+            .HasMaxLength(50)
+            .IsRequired();
+
+        builder.HasIndex(x => x.SpotifyId)
             .IsUnique();
 
-        // SQLite-compatible configuration for decimals
-        builder.Property(t => t.Tempo)
-            .HasColumnType("REAL"); // REAL for SQLite floating-point numbers
+        // Track metadata
+        builder.Property(x => x.Name)
+            .HasMaxLength(200)
+            .IsRequired();
 
-        builder.Property(t => t.Energy)
-            .HasColumnType("REAL");
+        builder.Property(x => x.Artist)
+            .HasMaxLength(200)
+            .IsRequired();
 
-        builder.Property(t => t.Danceability)
-            .HasColumnType("REAL");
+        builder.Property(x => x.DurationMs)
+            .IsRequired();
 
-        builder.Property(t => t.Valence)
-            .HasColumnType("REAL");
+        builder.Property(x => x.SpotifyUri)
+            .HasConversion(
+                v => v != null ? v.ToString() : null,
+                v => v != null ? new Uri(v) : null);
+
+        // Audio Features relationship - Ensure required with cascade delete
+        builder.HasOne(x => x.Features)
+            .WithOne(x => x.Track)
+            .HasForeignKey<AudioFeatures>(x => x.TrackId)
+            .IsRequired()
+            .OnDelete(DeleteBehavior.Cascade);
+
+        // Create indexes for commonly queried fields
+        builder.HasIndex(x => x.Artist);
+        builder.HasIndex(x => x.Name);
     }
 }

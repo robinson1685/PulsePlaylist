@@ -1,36 +1,57 @@
 # PulsePlaylist - Active Context
 
-**Last Updated:** March 14, 2025
+**Last Updated:** March 30, 2025
 
 ## Current Work Focus
 
-- **Phase 1 Implementation:** Starting the actual coding for **Phase 1: Core Domain Model Setup**.
-- **Test-Driven Development (TDD):** Implementing domain entities (`Track`, `AudioFeatures`), value objects (`WorkoutIntensity`, `PlaylistSettings`), and associated unit tests (`PulsePlaylist.Domain.Tests`) using xUnit and FluentAssertions, following the detailed prompt generated previously.
-- **Establishing Core Business Logic:** Ensuring the initial domain models correctly capture the fundamental concepts of the applicationUser , tracks, features, and workout settings.
+- **Phase 2 Implementation:** Starting the Data Access Layer implementation with PostgreSQL and EF Core 9.
+- **Infrastructure Focus:** Setting up database connections, migrations, and repository pattern implementations.
+- **Test Strategy:** Expanding test coverage to include integration tests with TestContainers.
 
 ## Recent Changes
 
-- **Project Structure Finalized:** All .NET projects (`.API`, `.Application`, `.Domain`, `.Infrastructure`, `.WebApp`, `.Mobile`, `.AppHost`, `.ServiceDefaults`, `Migrators`) are now organized under the `src/` directory. The Python ML project (`PulsePlaylist.AdaptationEngine`) also in /src.
-- **Technology Stack Confirmed:** Solidified choices include .NET 9, C# 12, PostgreSQL with EF Core 9, ASP.NET Core Identity, Minimal APIs, MAUI Blazor Hybrid (for `.Mobile`), Blazor Web App (for `.Web`), MudBlazor, .NET Aspire, Python/FastAPI/PyTorch (for ML), Microsoft.OpenApi, AutoMapper, FluentValidation, TestContainers (for testing), Serilog, OpenTelemetry.
-- **Build Plan Defined:** Established a detailed, phased iterative build plan prioritizing the mobile app MVP core loop (Mobile -> Backend -> Simple Adaptation -> Music Playback).
-- **Foundational Documents Created:** `projectbrief.md` generated to define scope and goals. An expert assessment analysis was reviewed, confirming feasibility but highlighting risks (esp. YouTube Music).
-- **Detailed Phase Prompts Generated:** Created specific, context-rich prompts for guiding the implementation of Phase 1 (Domain), Phase 2 (Data Access with Postgres/Aspire/Identity), and Phase 3 (API with Identity/Microsoft.OpenApi/AutoMapper).
-- **`.gitignore` Corrected:** Resolved issues with `bin`/`obj` folders not being ignored.
+- **Phase 1 Completed Successfully:**
+  - All domain entities implemented and fully tested (92 passing tests)
+  - Clean Architecture principles validated through implementation
+  - Business rules enforced via comprehensive test coverage
+  - Domain events and value objects properly implemented
+  - JSON serialization/deserialization working for complex types
+  - Floating-point precision handling verified
+
+- **Project Structure Validated:**
+  - Domain layer isolation maintained
+  - Entity relationships defined
+  - Value objects properly encapsulated
+  - Test patterns established
 
 ## Next Steps
 
-1.  **Complete Phase 1 Implementation:** Finish writing tests and implementing the core domain entities and value objects as defined in the prompt. Ensure all tests pass.
-2.  **Begin Phase 2 Implementation (Data Access):** Start TDD for Phase 2, focusing on:
-    - Migrate my migrations from Sqlite to Postgres
-    - Verifying and setting up `ApplicationDbContext` is configured for PostgreSQL.
-    - Implementing repository interfaces for Phase 1 entities.
-    - Creating EF Core migrations for both domain and Identity schemas within the `PulsePlaylist.Infrastructure` project.
-    - Configuring PostgreSQL resource and connection strings within the `.NET Aspire` (`PulsePlaylist.AppHost`) setup.
-    - Setting up TestContainers for PostgreSQL integration testing (`PulsePlaylist.Infrastructure.Tests`).
-3.  **Prepare for Phase 3 (API):** Review the generated prompt for API implementation, ensuring understanding of Identity integration, AutoMapper setup, and Microsoft.OpenApi configuration.
+1.  **Begin Phase 2 Implementation:**
+    - Set up ApplicationDbContext with proper configuration
+    - Design repository interfaces in Application layer
+    - Implement repositories in Infrastructure layer
+    - Configure PostgreSQL connection and migrations
+    - Set up TestContainers for integration testing
+
+2.  **Database Configuration:**
+    - Configure provider-specific migrations in Migrators project
+    - Set up Aspire configuration for PostgreSQL
+    - Implement database seeding strategy
+    - Define proper indexing strategy
+
+3.  **Identity Integration:**
+    - Verify ASP.NET Core Identity schema compatibility
+    - Ensure proper transaction handling across Identity and domain operations
+    - Set up proper repository patterns for user-related operations
 
 ## Active Decisions and Considerations
 
+- **Database Strategy:** Using SQLite for development/testing but ensuring PostgreSQL compatibility through provider-specific migrations
+- **Repository Pattern:** How to structure repositories to maintain clean architecture while providing efficient querying capabilities
+- **Integration Testing:** Planning TestContainers setup for reliable database testing
+- **Identity Integration:** How to properly manage user-related operations while maintaining domain isolation
+- **Migration Strategy:** How to handle schema evolution and maintain data integrity
+- **Transaction Management:** Ensuring proper handling of operations that span multiple aggregates
 - **YouTube Music Integration Strategy:** Decision pending based on assessment risks. Likely deferring full integration for MVP, focusing solely on Spotify initially. Need to confirm limited scope (e.g., playlist import only?) or full deferral.
 - **Initial ML Model Approach:** Confirming the MVP will use simple rule-based logic within the backend service first, deferring the actual PyTorch model implementation until Phase 4. Architect the backend service to easily swap implementations later.
 - **Specific Health Metrics for MVP:** Confirming that **real-time Heart Rate** is the primary metric for MVP intensity calculation. Pace/Cadence integration to be considered post-MVP or if easily achievable alongside HR.

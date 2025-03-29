@@ -1,10 +1,9 @@
-using PulsePlaylist.Application.Common.Interfaces;
-using PulsePlaylist.Domain.Common;
-using PulsePlaylist.Domain.Entities;
-using PulsePlaylist.Domain.Identities;
-using PulsePlaylist.Infrastructure.Persistence.Extensions;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using PulsePlaylist.Application.Common.Interfaces;
+using PulsePlaylist.Domain.Entities;
+using PulsePlaylist.Domain.ValueObjects;
+using PulsePlaylist.Domain.Identities;
 using System.Reflection;
 
 namespace PulsePlaylist.Infrastructure.Persistence;
@@ -18,7 +17,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>, IApplica
     /// </summary>
     /// <param name="options">The options to be used by a <see cref="DbContext"/>.</param>
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
-       : base(options)
+        : base(options)
     {
     }
 
@@ -29,7 +28,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>, IApplica
 
     /// <summary>
     /// Gets or sets the AuditTrails DbSet.
-    /// </summary>
+    /// </summary> 
     public DbSet<AuditTrail> AuditTrails { get; set; }
 
     /// <summary>
@@ -42,6 +41,12 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>, IApplica
     /// </summary>
     public DbSet<Stock> Stocks { get; set; }
 
+    public DbSet<WorkoutSession> WorkoutSessions => Set<WorkoutSession>();
+    public DbSet<Track> Tracks => Set<Track>();
+    public DbSet<AudioFeatures> AudioFeatures => Set<AudioFeatures>();
+    public DbSet<Playlist> Playlists => Set<Playlist>();
+    public DbSet<PlaylistItem> PlaylistItems => Set<PlaylistItem>();
+
     /// <summary>
     /// Configures the schema needed for the identity framework.
     /// </summary>
@@ -49,7 +54,14 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>, IApplica
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
+
+        // Apply configurations from the Infrastructure assembly
         builder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
+
+        // Configure PlaylistSettings as owned type of ApplicationUser
+        builder.Entity<ApplicationUser>()
+            .OwnsOne(u => u.Settings);
+
     }
 
     /// <summary>
@@ -62,4 +74,3 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>, IApplica
         configurationBuilder.Properties<string>().HaveMaxLength(450);
     }
 }
-

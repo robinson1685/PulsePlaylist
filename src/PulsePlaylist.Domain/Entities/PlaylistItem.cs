@@ -1,6 +1,5 @@
 using PulsePlaylist.Domain.Common;
 using PulsePlaylist.Domain.Events;
-using PulsePlaylist.Domain.ValueObjects;
 
 namespace PulsePlaylist.Domain.Entities;
 
@@ -13,7 +12,7 @@ public class PlaylistItem : BaseAuditableEntity
     public string TrackId { get; private set; }
     public Track Track { get; private set; } = null!;
     public int Position { get; private set; }
-    public PlaylistId PlaylistId { get; private set; } = null!;
+    public string PlaylistId { get; private set; } = null!;
 
     // Navigation property for EF Core
     public Playlist Playlist { get; private set; } = null!;
@@ -23,11 +22,12 @@ public class PlaylistItem : BaseAuditableEntity
 
     public PlaylistItem(
         string id,
-        PlaylistId playlistId,
+        string playlistId,
         Track track,
         int position)
     {
-        ArgumentNullException.ThrowIfNull(playlistId);
+        if (string.IsNullOrWhiteSpace(playlistId))
+            throw new ArgumentException("Playlist ID cannot be empty", nameof(playlistId));
         ArgumentNullException.ThrowIfNull(track);
 
         if (position < 0)
@@ -40,7 +40,7 @@ public class PlaylistItem : BaseAuditableEntity
         Position = position;
     }
 
-    internal void UpdatePosition(int newPosition)
+    public void UpdatePosition(int newPosition)
     {
         if (newPosition < 0)
             throw new ArgumentException("Position cannot be negative", nameof(newPosition));
